@@ -8,7 +8,7 @@ import random
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import Client, TestCase, RequestFactory
@@ -1045,7 +1045,7 @@ class BundlePartnerTest(TestCase):
         try:
             authorization = Authorization.objects.get(
                 user=self.editor.user,
-                partners=Partner.objects.filter(pk=self.proxy_partner_1.pk),
+                partners=Partner.objects.get(pk=self.proxy_partner_1.pk),
             )
         except Authorization.DoesNotExist:
             self.fail("Authorization wasn't created in the first place.")

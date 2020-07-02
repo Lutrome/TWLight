@@ -37,7 +37,7 @@ import urllib.request, urllib.parse, urllib.error
 from annoying.functions import get_object_or_None
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.db.models import Q
 from django.utils.timezone import now
@@ -81,7 +81,7 @@ class UserProfile(models.Model):
         verbose_name_plural = "user profiles"
 
     # Related name for backwards queries defaults to "userprofile".
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     # Have they agreed to our terms?
     terms_of_use = models.BooleanField(
         default=False, help_text="Has this user agreed with the terms of use?"
@@ -138,7 +138,7 @@ class Editor(models.Model):
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Database recordkeeping.
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     # Set as non-editable.
     date_created = models.DateField(
         default=now, editable=False, help_text="When this profile was first created"
@@ -640,7 +640,7 @@ class Authorization(models.Model):
             elif self.partners.all().exists() and self.user and self.user.editor:
                 return Application.objects.filter(
                     ~Q(status=Application.NOT_APPROVED),
-                    partner=self.partners.all(),
+                    partner__in=self.partners.all(),
                     editor=self.user.editor,
                 ).latest("id")
             else:
